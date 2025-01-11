@@ -1,0 +1,17 @@
+create a test dev for the following tasks:
+1. create a github repo for the web app
+2. create a github separate repo for the test
+3. in the test ci pipeline, run the test on each pull request
+3.1. pull the latest code from the web app repo
+3.2. run the test
+3.3. upload the test results to the test repo
+4. in the web app ci pipeline, run the test on each pull request before merging to main
+4.1. pull the branch code from the web app repo
+4.2. run the tests with 'smoke' tag
+4.3. upload the test results to the web app repo
+4.4. if the test fails, do not merge to main
+4.5. if the test passes, merge to main then run the all tests on the latest code
+4.6. upload the test results to the web app repo
+
+Additional:
+1. I want to use containers for the app and the test
