@@ -19,7 +19,7 @@ jobs:
       - name: Checkout web app repo
         uses: actions/checkout@v4
         with:
-          repository: your-username/webapp-repo-name
+          repository: AlingBukang/webapp
           path: webapp
           token: ${{ secrets.GH_PAT }}
           ref: main  # Always test against main branch
