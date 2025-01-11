@@ -15,3 +15,4 @@ create a test dev for the following tasks:
 
 Additional:
 1. I want to use containers for the app and the test
+2. Test should be run in a container
