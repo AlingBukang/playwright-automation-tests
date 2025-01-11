@@ -1,0 +1,51 @@
+name: Full Test Suite
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.42.1
+    services:
+      webapp:
+        image: ${{ github.repository }}/webapp:${{ github.sha }}
+        ports:
+          - 3000:3000
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Checkout web app repo
+        uses: actions/checkout@v4
+        with:
+          repository: your-username/webapp-repo-name
+          path: webapp
+          token: ${{ secrets.GH_PAT }}
+          ref: main  # Always test against main branch
+          
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install web app dependencies
+        working-directory: webapp
+        run: npm ci
+        
+      - name: Install test dependencies
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      
+      - name: Run all tests
+        run: npx playwright test
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: http://webapp:3000
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-test-report
+          path: playwright-report/ 

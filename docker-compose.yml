@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  webapp:
+    build: 
+      context: ../src
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../src:/app
+      - /app/node_modules
+
+  tests:
+    build: .
+    depends_on:
+      - webapp
+    environment:
+      - PLAYWRIGHT_TEST_BASE_URL=http://webapp:3000
+    volumes:
+      - .:/tests
+      - /tests/node_modules
+      - ./playwright-report:/tests/playwright-report 
