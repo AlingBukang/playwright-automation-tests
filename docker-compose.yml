@@ -1,17 +1,20 @@
 version: '3.8'
 services:
   webapp:
-    build: 
-      context: ../src
-      dockerfile: Dockerfile
+    image: node:20-slim
+    environment:
+      - NODE_ENV=test
     ports:
       - "3000:3000"
     volumes:
-      - ../src:/app
+      - ${WEBAPP_PATH:-../webapp}:/app
       - /app/node_modules
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev"
 
   tests:
     build: .
+    image: mcr.microsoft.com/playwright:v1.42.1
     depends_on:
       - webapp
     environment:
@@ -19,4 +22,6 @@ services:
     volumes:
       - .:/tests
       - /tests/node_modules
-      - ./playwright-report:/tests/playwright-report 
+      - ./playwright-report:/tests/playwright-report
+    working_dir: /tests
+    command: sh -c "npm ci && npx playwright test" 
