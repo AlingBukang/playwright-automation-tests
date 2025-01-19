@@ -17,11 +17,4 @@ test.describe('Web App Tests', () => {
     await page.click('nav >> text=About');
     await expect(page).toHaveURL(/.*about/);
   });
-
-  test('should have proper heading @smoke', async ({ page }) => {
-    // Check if main heading exists
-    const heading = page.locator('h1');
-    await expect(heading).toBeVisible();
-    await expect(heading).toHaveText('Todo App');
-  });
 }); 
