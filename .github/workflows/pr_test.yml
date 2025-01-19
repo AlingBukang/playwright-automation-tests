@@ -31,31 +31,14 @@ jobs:
           context: .
           push: false
           load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: ghcr.io/alingbukang/test:pr-${{ github.event.pull_request.head.sha }}
 
       - name: Run Tests
         run: |
-          # Print environment for debugging
-          echo "Test image: ghcr.io/alingbukang/test:pr-${{ github.event.pull_request.head.sha }}"
-          echo "Current directory: $(pwd)"
-          ls -la
-          
-          # Pull webapp image explicitly
-          docker pull ghcr.io/alingbukang/webapp:latest
-          
-          # Show docker images
-          docker images
-          
-          # Run with verbose output
           TEST_IMAGE=ghcr.io/alingbukang/test:pr-${{ github.event.pull_request.head.sha }} \
-          docker compose -f docker-compose.yml up --verbose --exit-code-from tests
-          
-          # If tests fail, show logs
-          if [ $? -ne 0 ]; then
-            echo "Tests failed. Showing container logs:"
-            docker logs webapp
-            docker logs tests
-          fi
+          docker compose -f docker-compose.yml up --exit-code-from tests
 
       - name: Upload test results
         if: always()
