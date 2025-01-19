@@ -5,8 +5,9 @@ const config: PlaywrightTestConfig = {
   timeout: 30000,
   testMatch: '**/*.spec.ts', 
   retries: process.env.CI ? 2 : 0,
+  reporter: [['html', { outputFolder: 'playwright-report' }]],
   use: {
-    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000',
+    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:80',
     headless: process.env.CI ? true : false,
     viewport: { width: 1280, height: 720 },
     ignoreHTTPSErrors: true,
