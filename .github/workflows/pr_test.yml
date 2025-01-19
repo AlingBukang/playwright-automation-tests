@@ -35,8 +35,16 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ghcr.io/alingbukang/test:pr-${{ github.event.pull_request.head.sha }}
 
+      - name: Pull Webapp Image
+        run: |
+          # Try to pull specific platform image
+          docker pull --platform linux/amd64 ghcr.io/alingbukang/webapp:latest || \
+          docker pull --platform linux/arm64 ghcr.io/alingbukang/webapp:latest || \
+          (echo "Failed to pull webapp image" && exit 1)
+
       - name: Run Tests
         run: |
+          DOCKER_DEFAULT_PLATFORM=linux/amd64 \
           TEST_IMAGE=ghcr.io/alingbukang/test:pr-${{ github.event.pull_request.head.sha }} \
           docker compose -f docker-compose.yml up --exit-code-from tests
 
