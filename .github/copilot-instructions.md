@@ -185,13 +185,6 @@ import { ChartOfAccountsPage } from '@/pages/coa';
 import { GridType, FilterStatus } from '@/models/base';
 ```
 
-### Grid Operations
-```typescript
-await this.grid.waitForLoad();
-await this.grid.setFilter('searchTerm');
-const row = await this.grid.getRowByCode('ACC001', COAGridColumn.AccountCode);
-```
-
 ## Critical Don'ts
 - **No Direct Locators**: Use page object methods in tests
 - **No Hard Waits**: Use `waitForLoad()` and auto-retrying assertions

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Determine base (assumes origin/main exists); fallback one commit back.
+BASE_REF=$(git merge-base HEAD origin/main 2>/dev/null || true)
+[ -z "$BASE_REF" ] && BASE_REF=HEAD~1
+
+CHANGED_FILES=$(git diff --name-only "$BASE_REF"...HEAD || true)
+echo "[pre-push] Changed files count: $(echo "$CHANGED_FILES" | grep -c . || echo 0)"
+
+# Skip if only non-code files changed (docs, workflows, configs)
+NON_CODE_CHANGED=$(echo "$CHANGED_FILES" | grep -viE '\\.(md|yml|yaml|gitignore)$' | grep -vE '^(package\\.json|\\.github/)' || true)
+if [ -z "$NON_CODE_CHANGED" ]; then
+  echo "[pre-push] Only documentation/config changes detected. Skipping checks."
+  exit 0
+fi
+
+echo "[pre-push] Type check..."
+npx tsc -p tsconfig.json --noEmit
+
+# Lint only changed TS files.
+CHANGED_TS=$(echo "$CHANGED_FILES" | grep -E '\\.(ts|tsx)$' || true)
+if [ -n "$CHANGED_TS" ]; then
+  echo "[pre-push] Linting changed TS files..."
+  # shellcheck disable=SC2086
+  npx eslint $CHANGED_TS || { echo "Lint errors in changed files." >&2; exit 1; }
+else
+  echo "[pre-push] No TS changes => skip lint."
+fi
+
+# Run changed spec files directly (limit to small sets). Otherwise run smoke tag.
+CHANGED_SPECS=$(echo "$CHANGED_FILES" | grep -E '\\.spec\\.ts$' || true)
+if [ -n "$CHANGED_SPECS" ]; then
+  COUNT=$(echo "$CHANGED_SPECS" | wc -l | awk '{print $1}')
+  if [ "$COUNT" -le 20 ]; then
+    echo "[pre-push] Running $COUNT changed spec(s)..."
+    # shellcheck disable=SC2086
+    npx playwright test --config=playwright/playwright.config.ts --grep-invert '\\[BUG #\\d+\\]' $CHANGED_SPECS
+  else
+    echo "[pre-push] $COUNT spec changes (large) => run smoke tag only"
+    npx playwright test --config=playwright/playwright.config.ts --grep @smoke --grep-invert '\\[BUG #\\d+\\]'
+  fi
+else
+  echo "[pre-push] No spec changes => quick smoke run"
+  npx playwright test --config=playwright/playwright.config.ts --grep @smoke --grep-invert '\\[BUG #\\d+\\]'
+fi
+
+echo "[pre-push] Done."
+exit 0

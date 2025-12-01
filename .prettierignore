@@ -1,0 +1,22 @@
+# Ignore artifacts:
+dist
+.vscode
+data
+**/doc
+**/docs
+docker-files
+playwright/.auth
+playwright/test-data
+
+# Ignore artifacts:
+node_modules
+.husky
+.editorconfig
+.eslintignore
+.prettierignore
+.gitignore
+.gitkeep
+.github/CODEOWNERS
+.nvmrc
+*.svg
+*.zip

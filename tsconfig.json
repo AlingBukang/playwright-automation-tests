@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./playwright/*"
+      ],
+      // Group base paths
+      "@base/*": [
+        "./playwright/pages/base/*"
+      ],
+      "@pages/*": [
+        "./playwright/pages/*"
+      ],
+      "@tests/*": [
+        "./playwright/tests/*"
+      ],
+      // Group external integrations
+      "@msw/*": [
+        "./playwright/msw/*"
+      ],
+      "@api/*": [
+        "./playwright/api/*"
+      ]
+    },
+    "allowJs": true,
+    "target": "ES2022",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "playwright/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/playwright-report/**",
+    "**/test-results/**"
+  ]
+}

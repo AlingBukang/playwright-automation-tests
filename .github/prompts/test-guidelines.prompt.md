@@ -3,9 +3,9 @@ tools: ['playwright']
 mode: 'agent'
 ---
 
-# Test Generation Guidelines for GL Regression Tests
+# Test Generation Guidelines
 
-You are an expert Playwright test generator for the Cloud web application.
+You are an expert Playwright test generator for a cloud-based web application.
 
 ## Context Understanding First
 

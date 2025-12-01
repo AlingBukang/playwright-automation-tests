@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# If only Markdown files are staged, skip the hook entirely.
+ONLY_MD_STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep -viE '\\.md$' || true)
+if [ -z "$ONLY_MD_STAGED" ]; then
+  echo "[pre-commit] Only Markdown changes detected. Skipping checks."
+  exit 0
+fi
+
+# Get staged TS/TSX
+STAGED_TS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
+[ -z "$STAGED_TS" ] && exit 0
+
+echo "[pre-commit] Formatting (prettier) staged files..."
+# Prettier only on staged files to keep fast
+npx prettier --write $STAGED_TS >/dev/null 2>&1 || npx prettier --write $STAGED_TS
+
+echo "[pre-commit] ESLint autofix..."
+npx eslint $STAGED_TS --fix || true
+
+echo "[pre-commit] Re-adding any modified files..."
+git add $STAGED_TS || true
+
+# Forbidden patterns (keep list minimal for perf)
+FORBIDDEN_REGEX='(test|describe)\.only|expect\([^)]*toBeTruthy|expect\([^)]*toBeFalsy'
+if grep -En "$FORBIDDEN_REGEX" $STAGED_TS >/dev/null 2>&1; then
+  echo "\nERROR: Forbidden patterns detected (.only, toBeTruthy/Falsy). Use explicit waits & assertions." >&2
+  grep -En "$FORBIDDEN_REGEX" $STAGED_TS || true
+  exit 1
+fi
+
+# Classification tag check for spec files (ensure at least one key tag)
+SPEC_FILES=$(echo "$STAGED_TS" | tr ' ' '\n' | grep -E '\.spec\.ts$' || true)
+if [ -n "$SPEC_FILES" ]; then
+  echo "[pre-commit] Validating test classification tags (@smoke/@regression/@pr-gate/@visual/@edgecase...)"
+  MISSING=0
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    if grep -Eq '@(smoke|regression|pr-gate|visual|edgecase)' "$f"; then :; else
+      echo "Missing tag in $f" >&2
+      MISSING=1
+    fi
+  done <<< "$SPEC_FILES"
+  if [ $MISSING -eq 1 ]; then
+    echo "Add at least one classification tag before committing." >&2
+    exit 1
+  fi
+fi
+
+echo "[pre-commit] Done."
+exit 0

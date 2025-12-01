@@ -1,0 +1,89 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "playwright"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:playwright/recommended"
+  ],
+  "env": {
+    "node": true,
+    "es6": true,
+    "browser": true
+  },
+  "rules": {
+    // TypeScript rules
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    // Playwright rules - Prioritized by impact
+    // CRITICAL - Must fix (errors that break tests)
+    "playwright/no-wait-for-timeout": "warn",
+    "playwright/no-wait-for-selector": "error",
+    "playwright/no-networkidle": "error",
+    "playwright/no-page-pause": "error",
+    "playwright/no-focused-test": "error",
+    "playwright/valid-expect": "error",
+    "playwright/valid-describe-callback": "error",
+
+    // HIGH PRIORITY - Should fix (test reliability)
+    "playwright/no-conditional-in-test": "off",
+    "playwright/no-conditional-expect": "warn",
+    "playwright/expect-expect": "off",
+    "playwright/no-useless-await": "warn",
+
+    // MEDIUM PRIORITY - Gradual improvement (modern patterns)
+    "playwright/prefer-web-first-assertions": "warn",
+    "playwright/prefer-to-be": "warn",
+    "playwright/prefer-to-have-length": "warn",
+    "playwright/no-element-handle": "warn",
+    "playwright/no-eval": "warn",
+    "playwright/prefer-strict-equal": "warn",
+
+    // LOW PRIORITY - Code quality (non-breaking)
+    "playwright/no-raw-locators": "off", // Too many violations
+    "playwright/no-nth-methods": "off",  // Too many violations
+    "playwright/no-force-option": "off", // Sometimes needed for complex UIs
+    "playwright/no-skipped-test": "off", // Allow during development
+    "playwright/no-nested-step": "off",  // Allow for complex test structure
+    "playwright/no-standalone-expect": "off",
+
+    // OPTIONAL - Nice to have
+    "playwright/require-top-level-describe": "off",
+    "playwright/valid-title": "off",
+    "playwright/no-duplicate-hooks": "warn",
+    "playwright/prefer-comparison-matcher": "off",
+    "playwright/prefer-hooks-on-top": "warn",
+    // Basic rules
+    "no-undef": "off",
+    "no-unused-vars": "off",
+    "no-extra-semi": "off"
+  },
+  "ignorePatterns": [
+    "**/*.{css,html,json,md,svg,yml,zip}",
+    "node_modules/",
+    "dist/",
+    "build/",
+    "doc*/**/*",
+    "test-results/**/*",
+    "playwright-report/**/*",
+    "scripts/**/*",
+    "utils/**/*",
+    "docker-files/**/*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "**/*.spec.ts"
+      ],
+      "rules": {
+        "playwright/no-standalone-expect": "off"
+      }
+    }
+  ]
+}
