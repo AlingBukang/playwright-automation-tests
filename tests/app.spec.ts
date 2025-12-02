@@ -13,7 +13,6 @@ test.describe('Web App Tests', () => {
   });
 
   test('should handle navigation', async ({ page }) => {
-    // Test navigation between pages
     await page.click('nav >> text=About');
     await expect(page).toHaveURL(/.*about/);
   });
